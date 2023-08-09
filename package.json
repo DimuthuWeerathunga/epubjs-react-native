@@ -31,7 +31,7 @@
     "test:coverage": "jest --coverage --no-cache --runInBand --passWithNoTests --forceExit",
     "build": "bob build",
     "release": "yarn build && npm publish",
-    "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project",
+    "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project"
   },
   "keywords": [
     "react",
