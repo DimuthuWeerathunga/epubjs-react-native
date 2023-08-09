@@ -32,9 +32,6 @@
     "build": "bob build",
     "release": "yarn build && npm publish",
     "release-local": "yarn build && npm link && echo [FINISH]: Run \"npm link @epubjs-react-native/core\" to link the package to your project",
-    "example-bare": "yarn --cwd example-bare",
-    "example-expo": "yarn --cwd example-expo",
-    "bootstrap": "yarn example-bare && yarn example-expo && yarn && yarn example-bare pods && yarn example-expo pods"
   },
   "keywords": [
     "react",
