@@ -4,12 +4,13 @@ import { FileSystemDownloadResult } from 'expo-file-system';
 import { LoadingFile } from './utils/LoadingFile';
 import type { ReaderProps } from './types';
 import { View } from './View';
-import { useInjectinjectWebviewVariables } from './hooks/useInjectWebviewVariables';
+import { useInjectWebVieWVariables } from './hooks/useInjectWebviewVariables';
 import { ReaderContext, defaultTheme as initialTheme } from './context';
 import { isURL } from './utils/isURL';
 import { getSourceType } from './utils/getSourceType';
 import { getSourceName } from './utils/getPathname';
 import { SourceType } from './utils/enums/source-type.enum';
+import { SafeAreaView, Text } from 'react-native';
 
 // ...
 export function Reader({
@@ -33,7 +34,7 @@ export function Reader({
   } = useFileSystem();
 
   const { setIsLoading, isLoading } = useContext(ReaderContext);
-  const { injectWebviewVariables } = useInjectinjectWebviewVariables();
+  const { injectWebVieWVariables } = useInjectWebVieWVariables();
   const [template, setTemplate] = useState<string | null>(null);
   const [templateUrl, setTemplateUrl] = useState<string | null>(null);
   const [allowedUris, setAllowedUris] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export function Reader({
 
       const jzipDownloadResumable = FileSystem.createDownloadResumable(
         'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.5/jszip.min.js',
-        FileSystem.documentDirectory + 'jszip.min.js',
+        `${FileSystem.documentDirectory}jszip.min.js`,
         {},
         () => {}
       );
@@ -61,7 +62,7 @@ export function Reader({
 
       const epubjsDownloadResumable = FileSystem.createDownloadResumable(
         'https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js',
-        FileSystem.documentDirectory + 'epub.min.js',
+        `${FileSystem.documentDirectory}epub.min.js`,
         {},
         () => {}
       );
@@ -84,7 +85,7 @@ export function Reader({
         if (!isExternalSource) {
           if (sourceType === SourceType.BASE64) {
             setTemplate(
-              injectWebviewVariables({
+              injectWebVieWVariables({
                 jzipJs: jzipJsFileUri,
                 epubJs: epubJsFileUri,
                 type: SourceType.BASE64,
@@ -98,7 +99,7 @@ export function Reader({
             setIsLoading(false);
           } else {
             setTemplate(
-              injectWebviewVariables({
+              injectWebVieWVariables({
                 jzipJs: jzipJsFileUri,
                 epubJs: epubJsFileUri,
                 type: SourceType.BINARY,
@@ -122,7 +123,7 @@ export function Reader({
 
           if (sourceType === SourceType.OPF) {
             setTemplate(
-              injectWebviewVariables({
+              injectWebVieWVariables({
                 jzipJs: jzipJsFileUri,
                 epubJs: epubJsFileUri,
                 type: sourceType,
@@ -135,14 +136,14 @@ export function Reader({
 
             setIsLoading(false);
           } else {
-            let { uri: bookFileUri } = await downloadFile(src, sourceName);
+            const { uri: bookFileUri } = await downloadFile(src, sourceName);
 
             if (!bookFileUri) throw new Error("Couldn't download book");
 
             setAllowedUris(`${bookFileUri},${jzipJsFileUri},${epubJsFileUri}`);
 
             setTemplate(
-              injectWebviewVariables({
+              injectWebVieWVariables({
                 jzipJs: jzipJsFileUri,
                 epubJs: epubJsFileUri,
                 type: sourceType,
@@ -162,7 +163,7 @@ export function Reader({
     defaultTheme,
     downloadFile,
     initialLocations,
-    injectWebviewVariables,
+    injectWebVieWVariables,
     setIsLoading,
     src,
   ]);
@@ -173,7 +174,7 @@ export function Reader({
         if (template) {
           const content = template;
 
-          const fileUri = FileSystem.documentDirectory + 'index.html';
+          const fileUri = `${FileSystem.documentDirectory}index.html`;
           await FileSystem.writeAsStringAsync(fileUri, content);
           setTemplateUrl(fileUri);
         }
@@ -196,7 +197,14 @@ export function Reader({
     });
   }
 
-  if (!template) throw new Error('Template is not set');
+  if (!templateUrl || !allowedUris) {
+    // throw new Error('Template not set');
+    return (
+      <SafeAreaView>
+        <Text>Template is not set</Text>
+      </SafeAreaView>
+    );
+  }
   return (
     <View
       templateUri={templateUrl!}
